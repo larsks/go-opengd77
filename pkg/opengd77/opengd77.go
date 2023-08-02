@@ -26,13 +26,6 @@ type (
 		port serial.Port
 	}
 
-	MemoryBlock struct {
-		Kind        int
-		FileOffset  int
-		RadioOffset int
-		Length      int
-	}
-
 	RadioOption func(*Radio) error
 )
 
@@ -42,6 +35,17 @@ var (
 		{MEMTYPE_EEPROM, 0x7500, 0x7500, 0xb000 - 0x7500},
 		{MEMTYPE_FLASH, 0xb000, 0x7b000, 0x13e60},
 		{MEMTYPE_FLASH, 0x1ee60, 0x0000, 0x11a0},
+	}
+
+	ChannelBlocks = []int{
+		0x3780,
+		0x0b1b0,
+		0x0cdc0,
+		0x0e9d0,
+		0x105e0,
+		0x121f0,
+		0x13e00,
+		0x15a10,
 	}
 )
 
