@@ -82,7 +82,7 @@ func (ch *Channel) SetTxFreq(freq float64) {
 }
 
 func (ch *Channel) GetName() string {
-	return strings.TrimRight(string(ch.Name[:]), "\xff")
+	return ch.Name.String()
 }
 
 func (ch *Channel) SetName(name string) {
