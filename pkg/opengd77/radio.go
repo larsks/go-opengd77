@@ -22,6 +22,13 @@ const (
 )
 
 type (
+	MemoryBlock struct {
+		Kind        int
+		FileOffset  int
+		RadioOffset int
+		Length      int
+	}
+
 	Radio struct {
 		port serial.Port
 	}

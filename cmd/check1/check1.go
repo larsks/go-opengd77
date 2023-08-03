@@ -26,8 +26,8 @@ func main() {
 	for _, addr := range opengd77.ChannelBlocks {
 		fd.Seek(int64(addr)+16, 0)
 		for i := 0; i < 128; i++ {
-			ch := opengd77.Channel{}
-			if err := binary.Read(fd, binary.LittleEndian, &ch); err != nil {
+			ch := opengd77.NewChannel()
+			if err := binary.Read(fd, binary.LittleEndian, ch); err != nil {
 				panic(err)
 			}
 
@@ -35,12 +35,12 @@ func main() {
 				continue
 			}
 
-			fmt.Println(ch.Name)
 			if strings.Contains(string(ch.Name[:]), "MMRA") {
-				fmt.Printf("rx %s [t %s] tx %s [t %s]\n",
-					ch.RxFreq,
+				fmt.Println(ch.Name)
+				fmt.Printf("rx %f [t %s] tx %f [t %s]\n",
+					ch.GetRxFreq(),
 					ch.RxTone,
-					ch.TxFreq,
+					ch.GetTxFreq(),
 					ch.TxTone,
 				)
 			}
