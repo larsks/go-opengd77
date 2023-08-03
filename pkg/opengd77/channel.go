@@ -3,7 +3,6 @@ package opengd77
 import (
 	"bytes"
 	"fmt"
-	"strings"
 )
 
 type (
@@ -67,7 +66,7 @@ func (v BCDTone) String() string {
 }
 
 func (v PaddedName) String() string {
-	return strings.TrimRight(string(v[:]), "\xff")
+	return string(bytes.TrimRight(v[:], "\xff"))
 }
 
 func NewChannel() *Channel {
