@@ -3,6 +3,9 @@ package opengd77
 import "bytes"
 
 type (
+	// A TestBuffer is using for testing code that expects to
+	// read/write to/from a device or file. TestBuffer implements
+	// the io.ReadWriteCloser interface.
 	TestBuffer struct {
 		ReadBuffer, WriteBuffer *bytes.Buffer
 	}

@@ -11,8 +11,8 @@ import (
 )
 
 const (
+	// Max number of bytes can can be transferred using readChunk
 	MAX_TRANSFER_SIZE = 32
-	FLASH_BLOCK_SIZE  = 4096
 
 	MEMTYPE_FLASH         = 1
 	MEMTYPE_EEPROM        = 2
@@ -23,6 +23,8 @@ const (
 )
 
 type (
+	// A MemoryBlock maps between a block of memory in the radio
+	// and the corresponding location in the dump file
 	MemoryBlock struct {
 		Kind        int
 		FileOffset  int
@@ -30,6 +32,7 @@ type (
 		Length      int
 	}
 
+	// Radio represents a radio running OpenGD77
 	Radio struct {
 		serialDevice  string
 		serialMode    *serial.Mode
@@ -37,10 +40,12 @@ type (
 		port          io.ReadWriteCloser
 	}
 
+	// Represents an option that can be passed to the Radio constructor
 	RadioOption func(*Radio) error
 )
 
 var (
+	// Location of configuration data in the radio
 	ConfigBlocks = []MemoryBlock{
 		{MEMTYPE_EEPROM, 0x00e0, 0x00e0, 0x6000 - 0xe0},
 		{MEMTYPE_EEPROM, 0x7500, 0x7500, 0xb000 - 0x7500},
@@ -48,6 +53,7 @@ var (
 		{MEMTYPE_FLASH, 0x1ee60, 0x0000, 0x11a0},
 	}
 
+	// Location of channel storage in the radio
 	ChannelBlocks = []int{
 		0x3780,
 		0x0b1b0,
@@ -60,6 +66,9 @@ var (
 	}
 )
 
+// Use a custom object as the serial port. This can be used
+// to pass in an already open serial.Port object or to pass in
+// any other io.ReadWriteCloser for testing.
 func WithSerialPort(port io.ReadWriteCloser) RadioOption {
 	return func(radio *Radio) error {
 		radio.port = port
@@ -67,6 +76,7 @@ func WithSerialPort(port io.ReadWriteCloser) RadioOption {
 	}
 }
 
+// Set a custom read timeout on the serial port.
 func WithReadTimeout(timeout time.Duration) RadioOption {
 	return func(radio *Radio) error {
 		radio.serialTimeout = timeout
@@ -74,6 +84,8 @@ func WithReadTimeout(timeout time.Duration) RadioOption {
 	}
 }
 
+// Set a custom serial port configuration (data rate,
+// parity, stop bits, etc)
 func WithSerialMode(mode *serial.Mode) RadioOption {
 	return func(radio *Radio) error {
 		radio.serialMode = mode
@@ -81,6 +93,7 @@ func WithSerialMode(mode *serial.Mode) RadioOption {
 	}
 }
 
+// Create and return a new Radio object
 func NewRadio(serialport string, options ...RadioOption) (*Radio, error) {
 	mode := &serial.Mode{
 		BaudRate: 9600,
@@ -104,6 +117,9 @@ func NewRadio(serialport string, options ...RadioOption) (*Radio, error) {
 	return radio, nil
 }
 
+// Open the serial port and set the port attribute on the Radio object.
+// This will not be necessary if you've passed in a custom port
+// using WithSerialPort.
 func (radio *Radio) Open() error {
 	port, err := serial.Open(radio.serialDevice, radio.serialMode)
 	if err != nil {
