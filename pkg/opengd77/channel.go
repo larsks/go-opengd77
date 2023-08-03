@@ -1,6 +1,7 @@
 package opengd77
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 )
@@ -49,6 +50,14 @@ func (v BCDFrequency) String() string {
 	return fmt.Sprintf("%0.4f", float64(FromBCD(int(v)))/100000.0)
 }
 
+func (v BCDFrequency) Float() float64 {
+	return float64(FromBCD(int(v))) / 100000.0
+}
+
+func (v BCDTone) Float() float64 {
+	return float64(FromBCD(int(v))) / 10.0
+}
+
 func (v BCDTone) String() string {
 	if v == 0xffff {
 		return "-"
@@ -62,15 +71,17 @@ func (v PaddedName) String() string {
 }
 
 func NewChannel() *Channel {
-	return &Channel{}
+	return &Channel{
+		Name: [16]byte(bytes.Repeat([]byte{0xff}, 16)),
+	}
 }
 
 func (ch *Channel) GetRxFreq() float64 {
-	return float64(FromBCD(int(ch.RxFreq))) / 100000.0
+	return ch.RxFreq.Float()
 }
 
 func (ch *Channel) GetTxFreq() float64 {
-	return float64(FromBCD(int(ch.TxFreq))) / 100000.0
+	return ch.TxFreq.Float()
 }
 
 func (ch *Channel) SetRxFreq(freq float64) {
@@ -86,12 +97,24 @@ func (ch *Channel) GetName() string {
 }
 
 func (ch *Channel) SetName(name string) {
-	chname := PaddedName{
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	}
-
-	copy(chname[:], []byte(name)[:16])
+	var chname PaddedName = [16]byte(bytes.Repeat([]byte{0xff}, 16))
+	copy(chname[:len(name)], []byte(name)[:16])
 
 	ch.Name = chname
+}
+
+func (ch *Channel) SetRxTone(tone float64) {
+	ch.RxTone = BCDTone(ToBCD(int(tone * 10.0)))
+}
+
+func (ch *Channel) SetTxTone(tone float64) {
+	ch.TxTone = BCDTone(ToBCD(int(tone * 10.0)))
+}
+
+func (ch *Channel) GetRxTone() float64 {
+	return ch.RxTone.Float()
+}
+
+func (ch *Channel) GetTxTone() float64 {
+	return ch.TxTone.Float()
 }
