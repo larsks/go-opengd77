@@ -8,14 +8,6 @@ import (
 	"strings"
 )
 
-func ternary(condition bool, valIfTrue, valIfFalse int) int {
-	if condition {
-		return valIfTrue
-	} else {
-		return valIfFalse
-	}
-}
-
 func main() {
 	fd, err := os.Open("data.bin")
 	if err != nil {
