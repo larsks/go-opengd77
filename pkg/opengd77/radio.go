@@ -175,6 +175,21 @@ func (radio *Radio) ScreenRender() error {
 	return radio.sendSimpleCommand([]byte{3})
 }
 
+// Convenience function for showing a one-line message
+func (radio *Radio) ShowMessage(size int, message string) error {
+	var err error
+
+	if err = radio.ScreenClear(); err == nil {
+		if err = radio.ScreenShow(); err == nil {
+			if err = radio.ScreenPrint(0, 16, byte(size), 1, 0, message); err == nil {
+				err = radio.ScreenRender()
+			}
+		}
+	}
+
+	return err
+}
+
 func (radio *Radio) ScreenBacklight() error {
 	return radio.sendSimpleCommand([]byte{4})
 }
