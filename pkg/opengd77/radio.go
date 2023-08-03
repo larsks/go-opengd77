@@ -118,7 +118,11 @@ func (radio *Radio) Open() error {
 }
 
 func (radio *Radio) Close() error {
-	return radio.port.Close()
+	if radio.port != nil {
+		return radio.port.Close()
+	}
+
+	return nil
 }
 
 func (radio *Radio) sendSimpleCommand(data []byte) error {
