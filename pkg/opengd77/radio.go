@@ -31,7 +31,10 @@ type (
 	}
 
 	Radio struct {
-		port serial.Port
+		serialDevice  string
+		serialMode    *serial.Mode
+		serialTimeout time.Duration
+		port          io.ReadWriteCloser
 	}
 
 	RadioOption func(*Radio) error
@@ -57,9 +60,24 @@ var (
 	}
 )
 
+func WithSerialPort(port io.ReadWriteCloser) RadioOption {
+	return func(radio *Radio) error {
+		radio.port = port
+		return nil
+	}
+}
+
 func WithReadTimeout(timeout time.Duration) RadioOption {
 	return func(radio *Radio) error {
-		return radio.port.SetReadTimeout(timeout)
+		radio.serialTimeout = timeout
+		return nil
+	}
+}
+
+func WithSerialMode(mode *serial.Mode) RadioOption {
+	return func(radio *Radio) error {
+		radio.serialMode = mode
+		return nil
 	}
 }
 
@@ -70,16 +88,11 @@ func NewRadio(serialport string, options ...RadioOption) (*Radio, error) {
 		DataBits: 8,
 		StopBits: serial.OneStopBit,
 	}
-	port, err := serial.Open(serialport, mode)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open %s: %w", serialport, err)
-	}
-	if err := port.SetReadTimeout(3 * time.Second); err != nil {
-		return nil, err
-	}
 
 	radio := &Radio{
-		port: port,
+		serialDevice:  serialport,
+		serialMode:    mode,
+		serialTimeout: 3 * time.Second,
 	}
 
 	for _, opt := range options {
@@ -89,6 +102,19 @@ func NewRadio(serialport string, options ...RadioOption) (*Radio, error) {
 	}
 
 	return radio, nil
+}
+
+func (radio *Radio) Open() error {
+	port, err := serial.Open(radio.serialDevice, radio.serialMode)
+	if err != nil {
+		return fmt.Errorf("failed to open %s: %w", radio.serialDevice, err)
+	}
+	if err := port.SetReadTimeout(radio.serialTimeout); err != nil {
+		return fmt.Errorf("failed to set serial port timeout: %w", err)
+	}
+	radio.port = port
+
+	return nil
 }
 
 func (radio *Radio) Close() error {
