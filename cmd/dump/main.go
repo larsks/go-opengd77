@@ -1,33 +1,50 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 
 	"opengd77/pkg/opengd77"
 )
 
+var (
+	serialDevice string
+	outputFile   string
+)
+
+func init() {
+	flag.StringVar(&serialDevice, "port", "/dev/ttyACM0", "set serial port")
+	flag.StringVar(&outputFile, "output", "data.bin", "set output filename")
+}
+
 func main() {
-	radio, err := opengd77.NewRadio("/dev/ttyACM0")
+	flag.Parse()
+
+	radio, err := opengd77.NewRadio(serialDevice)
 	if err != nil {
+		panic(err)
+	}
+	if err := radio.Open(); err != nil {
 		panic(err)
 	}
 	defer radio.Close()
 
-	radio.ScreenClear()
-	radio.ScreenShow()
-	radio.ScreenPrint(0, 16, 3, 1, 0, "Reading codeplug")
-	radio.ScreenRender()
-
-	fd, err := os.Create("data.bin")
+	fd, err := os.Create(outputFile)
 	if err != nil {
 		panic(err)
 	}
 	defer fd.Close()
 
-	radio.ReadCodePlug(fd)
+	if err := radio.ShowMessage(3, "Reading codeplug"); err != nil {
+		panic(err)
+	}
+
+	log.Printf("reading codeplug")
+	if err := radio.ReadCodePlug(fd); err != nil {
+		panic(err)
+	}
 
 	radio.ScreenClose()
-
 	log.Printf("all done")
 }
