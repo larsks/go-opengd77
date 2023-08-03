@@ -25,21 +25,7 @@ func main() {
 	}
 	defer fd.Close()
 
-	for _, block := range opengd77.ConfigBlocks {
-		log.Printf("reading %d bytes from %x", block.Length, block.RadioOffset)
-		buf := make([]byte, block.Length)
-		if err := radio.ReadMemory(block.Kind, block.RadioOffset, block.Length, buf); err != nil {
-			panic(err)
-		}
-
-		if _, err := fd.Seek(int64(block.FileOffset), 0); err != nil {
-			panic(err)
-		}
-
-		if _, err := fd.Write(buf); err != nil {
-			panic(err)
-		}
-	}
+	radio.ReadCodePlug(fd)
 
 	radio.ScreenClose()
 

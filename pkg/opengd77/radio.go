@@ -3,6 +3,7 @@ package opengd77
 import (
 	"encoding/binary"
 	"fmt"
+	"io"
 	"log"
 	"time"
 
@@ -235,5 +236,24 @@ func (radio *Radio) ReadMemory(mode, addr, length int, data []byte) error {
 		offset += nb
 	}
 
+	return nil
+}
+
+func (radio *Radio) ReadCodePlug(w io.WriteSeeker) error {
+	for _, block := range ConfigBlocks {
+		log.Printf("reading %d bytes from %x", block.Length, block.RadioOffset)
+		buf := make([]byte, block.Length)
+		if err := radio.ReadMemory(block.Kind, block.RadioOffset, block.Length, buf); err != nil {
+			return fmt.Errorf("failed to read from radio: %w", err)
+		}
+
+		if _, err := w.Seek(int64(block.FileOffset), 0); err != nil {
+			return fmt.Errorf("failed to set output position: %w", err)
+		}
+
+		if _, err := w.Write(buf); err != nil {
+			return fmt.Errorf("failed to write data: %w", err)
+		}
+	}
 	return nil
 }
