@@ -18,10 +18,11 @@ func main() {
 		panic(err)
 	}
 
-	for i := 0; i < opengd77.CODEPLUG_ZONE_MAX_COUNT; i++ {
-		zone, err := cp.Zone(i)
-		if err != nil {
-			panic(err)
+	iter := cp.ZoneIter()
+	for {
+		_, zone, ok := iter()
+		if !ok {
+			break
 		}
 
 		if zone.Name[0] == 0xff || zone.Name[0] == 0 {

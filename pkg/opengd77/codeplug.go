@@ -103,6 +103,13 @@ func (cp *Codeplug) ChannelIter() func() (int, *Channel, bool) {
 }
 
 func (cp *Codeplug) Zone(n int) (*Zone, error) {
+	if n <= 0 {
+		return nil, fmt.Errorf("invalid zone number")
+	}
+
+	// zones are 1-indexed
+	n--
+
 	if n > CODEPLUG_ZONE_MAX_COUNT {
 		return nil, fmt.Errorf("zone number too large")
 	}
@@ -114,6 +121,25 @@ func (cp *Codeplug) Zone(n int) (*Zone, error) {
 	}
 
 	return &zone, nil
+}
+
+func (cp *Codeplug) ZoneIter() func() (int, *Zone, bool) {
+	n := 1
+
+	return func() (int, *Zone, bool) {
+		for {
+			zone, err := cp.Zone(n)
+			n++
+			if err != nil {
+				return n, nil, false
+			}
+			if zone.Name[0] == 0xff {
+				continue
+			}
+
+			return n, zone, true
+		}
+	}
 }
 
 func (cp *Codeplug) Settings() (*Settings, error) {
