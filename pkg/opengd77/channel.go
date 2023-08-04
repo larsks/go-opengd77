@@ -93,6 +93,20 @@ type (
 	}
 )
 
+var (
+	// Location of channel storage in the codeplug
+	ChannelBlocks = []int{
+		0x3780,
+		0x0b1b0,
+		0x0cdc0,
+		0x0e9d0,
+		0x105e0,
+		0x121f0,
+		0x13e00,
+		0x15a10,
+	}
+)
+
 func NewChannel() *Channel {
 	return &Channel{
 		Name: [16]byte(bytes.Repeat([]byte{0xff}, 16)),

@@ -52,18 +52,6 @@ var (
 		{MEMTYPE_FLASH, 0xb000, 0x7b000, 0x13e60},
 		{MEMTYPE_FLASH, 0x1ee60, 0x0000, 0x11a0},
 	}
-
-	// Location of channel storage in the radio
-	ChannelBlocks = []int{
-		0x3780,
-		0x0b1b0,
-		0x0cdc0,
-		0x0e9d0,
-		0x105e0,
-		0x121f0,
-		0x13e00,
-		0x15a10,
-	}
 )
 
 // Use a custom object as the serial port. This can be used
