@@ -50,6 +50,9 @@ type (
 		Power    bool
 	}
 
+	PackedLibreDMRFlag1 byte
+	PackedChannelFlag4  byte
+
 	Channel struct {
 		Name          PaddedName
 		RxFreq        BCDFrequency
@@ -66,7 +69,7 @@ type (
 		TxTone        BCDTone
 		VoiceEmphasis byte
 		TxSig         byte
-		LibreDMRFlag1 byte // was UnmuteRule
+		LibreDMRFlag1 PackedLibreDMRFlag1 // was UnmuteRule
 
 		// The following three bytes are the optional DMR ID
 		// if CODEPLUG_CHANNEL_LIBREDMR_FLAG1_OPTIONAL_DMRID
@@ -80,10 +83,10 @@ type (
 		TxColor         byte
 		EmergencySystem byte
 		ContactNumber   uint16
-		Flag1           byte // lower 6 bits TA Tx control
-		Flag2           byte // bits...0x40 = TS
-		Flag3           byte // bits... 0x20 = DisableAllLeds
-		Flag4           byte // bits... 0x80 = Power, 0x40 = Vox, 0x20 = ZoneSkip (AutoScan), 0x10 = AllSkip (LoneWoker), 0x08 = AllowTalkaround, 0x04 = OnlyRx, 0x02 = Channel width, 0x01 = Squelch
+		Flag1           byte               // lower 6 bits TA Tx control
+		Flag2           byte               // bits...0x40 = TS
+		Flag3           byte               // bits... 0x20 = DisableAllLeds
+		Flag4           PackedChannelFlag4 // bits... 0x80 = Power, 0x40 = Vox, 0x20 = ZoneSkip (AutoScan), 0x10 = AllSkip (LoneWoker), 0x08 = AllowTalkaround, 0x04 = OnlyRx, 0x02 = Channel width, 0x01 = Squelch
 		VFOOffset       uint16
 		VFOFlag         byte // uppder 4 bits are the step frequency (2.5, 5, 6.25, 10, 12.5, 25, 30, 50)
 		Squelch         byte
@@ -139,7 +142,7 @@ func (ch *Channel) GetTxTone() float64 {
 	return ch.TxTone.Float()
 }
 
-func ChannelFlag4FromInt(v int) *ChannelFlag4 {
+func (v PackedChannelFlag4) Unpack() *ChannelFlag4 {
 	return &ChannelFlag4{
 		Squelch:  v&CODEPLUG_CHANNEL_FLAG4_SQUELCH != 0,
 		BW25K:    v&CODEPLUG_CHANNEL_FLAG4_BW_25K != 0,
@@ -151,11 +154,59 @@ func ChannelFlag4FromInt(v int) *ChannelFlag4 {
 	}
 }
 
-func LibreDMRFlag1FromInt(v int) *LibreDMRFlag1 {
+func (v *ChannelFlag4) Pack() (res PackedChannelFlag4) {
+	if v.Squelch {
+		res |= CODEPLUG_CHANNEL_FLAG4_SQUELCH
+	}
+
+	if v.BW25K {
+		res |= CODEPLUG_CHANNEL_FLAG4_BW_25K
+	}
+
+	if v.RxOnly {
+		res |= CODEPLUG_CHANNEL_FLAG4_RX_ONLY
+	}
+
+	if v.AllSkip {
+		res |= CODEPLUG_CHANNEL_FLAG4_ALL_SKIP
+	}
+
+	if v.ZoneSkip {
+		res |= CODEPLUG_CHANNEL_FLAG4_ZONE_SKIP
+	}
+
+	if v.Power {
+		res |= CODEPLUG_CHANNEL_FLAG4_POWER
+	}
+
+	return
+}
+
+func (v PackedLibreDMRFlag1) Unpack() *LibreDMRFlag1 {
 	return &LibreDMRFlag1{
 		DMRId:     v&CODEPLUG_CHANNEL_LIBREDMR_FLAG1_OPTIONAL_DMRID != 0,
 		NoBeep:    v&CODEPLUG_CHANNEL_LIBREDMR_FLAG1_NO_BEEP != 0,
 		NoEco:     v&CODEPLUG_CHANNEL_LIBREDMR_FLAG1_NO_ECO != 0,
 		OutOfBand: v&CODEPLUG_CHANNEL_LIBREDMR_FLAG1_OUT_OF_BAND != 0,
 	}
+}
+
+func (v *LibreDMRFlag1) Pack() (res PackedLibreDMRFlag1) {
+	if v.DMRId {
+		res |= CODEPLUG_CHANNEL_LIBREDMR_FLAG1_OPTIONAL_DMRID
+	}
+
+	if v.NoBeep {
+		res |= CODEPLUG_CHANNEL_LIBREDMR_FLAG1_NO_BEEP
+	}
+
+	if v.NoEco {
+		res |= CODEPLUG_CHANNEL_LIBREDMR_FLAG1_NO_ECO
+	}
+
+	if v.OutOfBand {
+		res |= CODEPLUG_CHANNEL_LIBREDMR_FLAG1_OUT_OF_BAND
+	}
+
+	return
 }

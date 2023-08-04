@@ -26,15 +26,15 @@ func main() {
 				continue
 			}
 
-			fmt.Println(ch.Name)
-			fmt.Printf("rx %f [t %s] tx %f [t %s]\n",
+			fmt.Printf("%s | rx %f [t %s] tx %f [t %s]\n",
+				ch.Name,
 				ch.GetRxFreq(),
 				ch.RxTone,
 				ch.GetTxFreq(),
 				ch.TxTone,
 			)
-			fmt.Printf("  libredmrflag1: %+v\n", opengd77.LibreDMRFlag1FromInt(int(ch.LibreDMRFlag1)))
-			fmt.Printf("  flag4: %+v\n", opengd77.ChannelFlag4FromInt(int(ch.Flag4)))
+			fmt.Printf("  libredmrflag1: %+v\n", ch.LibreDMRFlag1.Unpack())
+			fmt.Printf("  flag4: %+v\n", ch.Flag4.Unpack())
 		}
 	}
 }

@@ -71,3 +71,30 @@ func TestSetTxTone(t *testing.T) {
 	ch.SetTxTone(88.5)
 	assert.Equal(t, 88.5, ch.GetTxTone())
 }
+
+func TestChannelFlag4(t *testing.T) {
+	want := PackedChannelFlag4(CODEPLUG_CHANNEL_FLAG4_RX_ONLY | CODEPLUG_CHANNEL_FLAG4_ALL_SKIP)
+	unpacked := want.Unpack()
+	assert.True(t, unpacked.RxOnly)
+	assert.True(t, unpacked.AllSkip)
+	assert.False(t, unpacked.Vox)
+	assert.False(t, unpacked.BW25K)
+	assert.False(t, unpacked.Power)
+	assert.False(t, unpacked.Squelch)
+	assert.False(t, unpacked.ZoneSkip)
+
+	packed := unpacked.Pack()
+	assert.Equal(t, want, packed)
+}
+
+func TestLibreDMRFlag1(t *testing.T) {
+	want := PackedLibreDMRFlag1(byte(CODEPLUG_CHANNEL_LIBREDMR_FLAG1_OPTIONAL_DMRID | CODEPLUG_CHANNEL_LIBREDMR_FLAG1_NO_ECO))
+	unpacked := want.Unpack()
+	assert.True(t, unpacked.DMRId)
+	assert.True(t, unpacked.NoEco)
+	assert.False(t, unpacked.NoBeep)
+	assert.False(t, unpacked.OutOfBand)
+
+	packed := unpacked.Pack()
+	assert.Equal(t, want, packed)
+}
