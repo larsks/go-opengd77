@@ -12,6 +12,7 @@ import (
 const (
 	CODEPLUG_ADDR_USER_CALLSIGN    = 0x00E0
 	CODEPLUG_ADDR_GENERAL_SETTINGS = 0x00E0
+	CODEPLUG_ADDR_DEVICE_INFO      = 0x80
 )
 
 type (
@@ -124,4 +125,14 @@ func (cp *Codeplug) Settings() (*Settings, error) {
 	}
 
 	return &settings, nil
+}
+
+func (cp *Codeplug) DeviceInfo() (*DeviceInfo, error) {
+	info := DeviceInfo{}
+
+	if err := binary.Read(bytes.NewReader(cp.data[CODEPLUG_ADDR_DEVICE_INFO:]), binary.LittleEndian, &info); err != nil {
+		return nil, fmt.Errorf("failed to read device info: %w", err)
+	}
+
+	return &info, nil
 }

@@ -8,6 +8,7 @@ import (
 type (
 	BCDFrequency    uint32
 	BCDTone         uint16
+	BCD16           uint16
 	PaddedName      [16]byte
 	PaddedNameShort [8]byte
 )
@@ -30,6 +31,10 @@ func (v BCDTone) String() string {
 	} else {
 		return fmt.Sprintf("%0.1f", float64(FromBCD(int(v)))/10.0)
 	}
+}
+
+func (v BCD16) String() string {
+	return fmt.Sprintf("%0d", FromBCD(int(v)))
 }
 
 func (v PaddedName) String() string {
