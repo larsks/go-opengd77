@@ -101,21 +101,33 @@ func NewChannel() *Channel {
 }
 
 func (ch *Channel) String() string {
-	var mode string
+	mode := "A"
+	rxonly := ""
+	bw := "12.5"
 
-	if ch.Mode == 0 {
-		mode = "A"
-	} else {
+	if ch.Mode != 0 {
 		mode = "D"
 	}
 
-	return fmt.Sprintf("%-16s [%s] rx %f [t %s] tx %f [t %s]",
+	f4 := ch.Flag4.Unpack()
+
+	if f4.RxOnly {
+		rxonly = "rxonly"
+	}
+
+	if f4.BW25K {
+		bw = "25"
+	}
+
+	return fmt.Sprintf("%-16s [%s] rx %f [t %-5s] tx %f [t %-5s] %-4s %s",
 		ch.Name,
 		mode,
 		ch.GetRxFreq(),
 		ch.RxTone,
 		ch.GetTxFreq(),
 		ch.TxTone,
+		bw,
+		rxonly,
 	)
 }
 
