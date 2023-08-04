@@ -1,0 +1,4 @@
+*.g77
+cmd/dump-channels/dump-channels
+cmd/dump-codeplug/dump-codeplug
+cmd/dump-zones/dump-zones
