@@ -9,6 +9,11 @@ import (
 	"unsafe"
 )
 
+const (
+	CODEPLUG_ADDR_USER_CALLSIGN    = 0x00E0
+	CODEPLUG_ADDR_GENERAL_SETTINGS = 0x00E0
+)
+
 type (
 	Codeplug struct {
 		data []byte
@@ -34,10 +39,9 @@ var (
 
 func NewCodeplug(r io.Reader) (*Codeplug, error) {
 	cp := Codeplug{}
+	buf := make([]byte, 8192)
 
 	for {
-		buf := make([]byte, 8192)
-
 		nb, err := r.Read(buf)
 
 		if err != nil {
@@ -47,7 +51,7 @@ func NewCodeplug(r io.Reader) (*Codeplug, error) {
 			return nil, fmt.Errorf("failed to read codeplug: %w", err)
 		}
 
-		cp.data = append(cp.data, buf...)
+		cp.data = append(cp.data, buf[:nb]...)
 		if nb < len(buf) {
 			break
 		}
@@ -109,4 +113,15 @@ func (cp *Codeplug) Zone(n int) (*Zone, error) {
 	}
 
 	return &zone, nil
+}
+
+func (cp *Codeplug) Settings() (*Settings, error) {
+	settings := Settings{}
+
+	addr := CODEPLUG_ADDR_GENERAL_SETTINGS
+	if err := binary.Read(bytes.NewReader(cp.data[addr:]), binary.LittleEndian, &settings); err != nil {
+		return nil, fmt.Errorf("failed to read radio settings: %w", err)
+	}
+
+	return &settings, nil
 }

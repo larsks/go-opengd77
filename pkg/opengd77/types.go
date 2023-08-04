@@ -6,9 +6,10 @@ import (
 )
 
 type (
-	BCDFrequency uint32
-	BCDTone      uint16
-	PaddedName   [16]byte
+	BCDFrequency    uint32
+	BCDTone         uint16
+	PaddedName      [16]byte
+	PaddedNameShort [8]byte
 )
 
 func (v BCDFrequency) String() string {
@@ -32,5 +33,9 @@ func (v BCDTone) String() string {
 }
 
 func (v PaddedName) String() string {
+	return string(bytes.TrimRight(v[:], "\xff"))
+}
+
+func (v PaddedNameShort) String() string {
 	return string(bytes.TrimRight(v[:], "\xff"))
 }
