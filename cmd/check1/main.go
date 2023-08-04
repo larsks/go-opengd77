@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"opengd77/pkg/opengd77"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -27,15 +26,15 @@ func main() {
 				continue
 			}
 
-			if strings.Contains(string(ch.Name[:]), "MMRA") {
-				fmt.Println(ch.Name)
-				fmt.Printf("rx %f [t %s] tx %f [t %s]\n",
-					ch.GetRxFreq(),
-					ch.RxTone,
-					ch.GetTxFreq(),
-					ch.TxTone,
-				)
-			}
+			fmt.Println(ch.Name)
+			fmt.Printf("rx %f [t %s] tx %f [t %s]\n",
+				ch.GetRxFreq(),
+				ch.RxTone,
+				ch.GetTxFreq(),
+				ch.TxTone,
+			)
+			fmt.Printf("  libredmrflag1: %+v\n", opengd77.LibreDMRFlag1FromInt(int(ch.LibreDMRFlag1)))
+			fmt.Printf("  flag4: %+v\n", opengd77.ChannelFlag4FromInt(int(ch.Flag4)))
 		}
 	}
 }
