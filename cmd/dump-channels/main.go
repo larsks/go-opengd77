@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	fd, err := os.Open("data.bin")
+	fd, err := os.Open(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
